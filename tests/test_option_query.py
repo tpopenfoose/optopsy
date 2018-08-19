@@ -3,7 +3,6 @@ import pytest
 from optopsy.option_query import *
 from optopsy.option_strategy import long_call
 from .data_fixtures import one_day_data
-from .filter_fixtures import default_filters
 
 
 def test_calls(one_day_data):
@@ -72,10 +71,10 @@ def test_invalid_column_values(one_day_data, value):
                                    ('leg_1_dte', Period.DAY.value),
                                    ('leg_1_dte', Period.TWO_WEEKS.value),
                                    ('leg_1_dte', Period.SEVEN_WEEKS.value)])
-def test_lte(one_day_data, default_filters, value):
+def test_lte(one_day_data, value):
     values = (
         one_day_data
-        .pipe(long_call, default_filters)[1][0]
+        .pipe(long_call)[1][0]
         .pipe(lte, column=value[0], val=value[1])
     )[value[0]].unique()
 
@@ -91,10 +90,10 @@ def test_lte(one_day_data, default_filters, value):
                                    ('leg_1_dte', Period.DAY.value),
                                    ('leg_1_dte', Period.TWO_WEEKS.value),
                                    ('leg_1_dte', Period.SEVEN_WEEKS.value)])
-def test_gte(one_day_data, default_filters, value):
+def test_gte(one_day_data, value):
     values = (
         one_day_data
-        .pipe(long_call, default_filters)[1][0]
+        .pipe(long_call)[1][0]
         .pipe(gte, column=value[0], val=value[1])
     )[value[0]].unique()
 
@@ -110,10 +109,10 @@ def test_gte(one_day_data, default_filters, value):
                                    ('leg_1_dte', Period.DAY.value),
                                    ('leg_1_dte', Period.TWO_WEEKS.value),
                                    ('leg_1_dte', Period.SEVEN_WEEKS.value)])
-def test_eq(one_day_data, default_filters, value):
+def test_eq(one_day_data, value):
     values = (
         one_day_data
-        .pipe(long_call, default_filters)[1][0]
+        .pipe(long_call)[1][0]
         .pipe(eq, column=value[0], val=value[1])
     )[value[0]].unique()
 
@@ -129,10 +128,10 @@ def test_eq(one_day_data, default_filters, value):
                                    ('leg_1_dte', Period.DAY.value),
                                    ('leg_1_dte', Period.TWO_WEEKS.value),
                                    ('leg_1_dte', Period.SEVEN_WEEKS.value)])
-def test_lt(one_day_data, default_filters, value):
+def test_lt(one_day_data, value):
     values = (
         one_day_data
-        .pipe(long_call, default_filters)[1][0]
+        .pipe(long_call)[1][0]
         .pipe(lt, column=value[0], val=value[1])
     )[value[0]].unique()
 
@@ -148,10 +147,10 @@ def test_lt(one_day_data, default_filters, value):
                                    ('leg_1_dte', Period.DAY.value),
                                    ('leg_1_dte', Period.TWO_WEEKS.value),
                                    ('leg_1_dte', Period.SEVEN_WEEKS.value)])
-def test_ne(one_day_data, default_filters, value):
+def test_ne(one_day_data, value):
     values = (
         one_day_data
-        .pipe(long_call, default_filters)[1][0]
+        .pipe(long_call)[1][0]
         .pipe(ne, column=value[0], val=value[1])
     )[value[0]].unique()
     assert all(v != value[1] for v in values)
@@ -166,10 +165,10 @@ def test_ne(one_day_data, default_filters, value):
                                    ('leg_1_dte', Period.DAY.value, Period.ONE_WEEK.value),
                                    ('leg_1_dte', Period.TWO_WEEKS.value, Period.THREE_WEEKS.value)
                                    ])
-def test_between(one_day_data, default_filters, value):
+def test_between(one_day_data, value):
     values = (
         one_day_data
-        .pipe(long_call, default_filters)[1][0]
+        .pipe(long_call)[1][0]
         .pipe(between, column=value[0], start=value[1], end=value[2]))[value[0]].unique()
 
     assert all(value[1] <= v <= value[2] for v in values)

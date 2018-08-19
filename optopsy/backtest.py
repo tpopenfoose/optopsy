@@ -45,6 +45,11 @@ def _merge_filters(user_filters):
     return {**default_filters, **cleaned}
 
 
+def _apply_filters(data, filters):
+    return
+
+
+
 # this is the main function that runs the backtest engine
 def simulate(title, data, filters):
     # merge user defined filter with defaults
@@ -52,6 +57,8 @@ def simulate(title, data, filters):
 
     # call the appropriate option strategy function based on the 'strategy'
     # attribute of the filter
+    
+
 
     # option strategy function will create option spreads that match the entry
     # filter's parameters
