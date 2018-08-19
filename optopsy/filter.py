@@ -1,11 +1,17 @@
 from .option_query import *
 
-def abs_delta(data, ):
-	pass
-	
+
+def apply_entry_filters(leg, u_ilters):
+    pass
+
+
+def abs_delta():
+    pass
+
+
 def abs_delta_max():
-	pass
-	
-def abs delta_min():
-	pass
-	
+    pass
+
+
+def abs_delta_min():
+    pass

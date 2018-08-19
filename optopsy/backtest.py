@@ -20,6 +20,9 @@ default_filters = {
     'entry_dte_min': Period.FOUR_WEEKS.value - 3,
     'entry_dte_max': Period.FOUR_WEEKS.value + 3,
     'entry_spread_price': None,
+    'entry_leg_1_leg_2_dist': None,
+    'entry_leg_2_leg_3_dist': None,
+    'entry_leg_3_leg_4_dist': None,
     'exit_spread_price': None,
     'exit_dte': None,
     'exit_leg1_abs_delta': None,
@@ -33,21 +36,28 @@ default_filters = {
     'exit_leg3_abs_delta_max': None,
     'exit_leg4_abs_delta': None,
     'exit_leg4_abs_delta_min': None,
-    'exit_leg4_abs_delta_max': None,
-    'leg_1_leg_2_dist': None,
-    'leg_2_leg_3_dist': None,
-    'leg_3_leg_4_dist': None
+    'exit_leg4_abs_delta_max': None
+}
+
+strategy_map = {
+    'long_call': long_call,
+    'short_call': short_call,
+    'long_put': long_put,
+    'short_put': short_put,
+    'long_call_spread': long_call_spread,
+    'short_call_spread': short_call_spread,
+    'long_put_spread': long_put_spread,
+    'short_put_spread': short_put_spread,
+    'long_iron_condor': long_iron_condor,
+    'short_iron_condor': short_iron_condor,
+    'long_iron_butterfly': long_iron_butterfly,
+    'short_iron_butterfly': short_iron_butterfly
 }
 
 
 def _merge_filters(user_filters):
     cleaned = {k: k[v] for k, v in user_filters if k in default_filters.keys()}
     return {**default_filters, **cleaned}
-
-
-def _apply_filters(data, filters):
-    return
-
 
 
 # this is the main function that runs the backtest engine
@@ -57,8 +67,6 @@ def simulate(title, data, filters):
 
     # call the appropriate option strategy function based on the 'strategy'
     # attribute of the filter
-    
-
 
     # option strategy function will create option spreads that match the entry
     # filter's parameters

@@ -1,8 +1,27 @@
 import pytest
-
+import pandas as pd
 from optopsy.option_query import *
 from optopsy.option_strategy import long_call
 from .data_fixtures import one_day_data
+
+
+@pytest.fixture
+def sample_chain():
+    return (
+        pd.DataFrame({
+            'leg_1_quote_date': ['2016-01-05', '2016-01-06', '2016-01-07'],
+            'leg_1_underlying_price': [40.55, 41.55, 42.00],
+            'leg_1_strike': [20, 21, 23.50],
+            'leg_1_delta': [0.02, 0.02, 0.02],
+            'leg_1_dte': [10, 9, 8]
+        }
+        ).assign(
+            leg_1_quote_date=lambda r: pd.to_datetime(
+                r['leg_1_quote_date'],
+                infer_datetime_format=True,
+                format='%Y-%m-%d')
+        )
+    )
 
 
 def test_calls(one_day_data):
@@ -71,13 +90,8 @@ def test_invalid_column_values(one_day_data, value):
                                    ('leg_1_dte', Period.DAY.value),
                                    ('leg_1_dte', Period.TWO_WEEKS.value),
                                    ('leg_1_dte', Period.SEVEN_WEEKS.value)])
-def test_lte(one_day_data, value):
-    values = (
-        one_day_data
-        .pipe(long_call)[1][0]
-        .pipe(lte, column=value[0], val=value[1])
-    )[value[0]].unique()
-
+def test_lte(sample_chain, value):
+    values = (sample_chain.pipe(lte, column=value[0], val=value[1]))[value[0]].unique()
     assert all(v <= value[1] for v in values)
 
 
@@ -90,13 +104,8 @@ def test_lte(one_day_data, value):
                                    ('leg_1_dte', Period.DAY.value),
                                    ('leg_1_dte', Period.TWO_WEEKS.value),
                                    ('leg_1_dte', Period.SEVEN_WEEKS.value)])
-def test_gte(one_day_data, value):
-    values = (
-        one_day_data
-        .pipe(long_call)[1][0]
-        .pipe(gte, column=value[0], val=value[1])
-    )[value[0]].unique()
-
+def test_gte(sample_chain, value):
+    values = (sample_chain.pipe(gte, column=value[0], val=value[1]))[value[0]].unique()
     assert all(v >= value[1] for v in values)
 
 
@@ -109,13 +118,8 @@ def test_gte(one_day_data, value):
                                    ('leg_1_dte', Period.DAY.value),
                                    ('leg_1_dte', Period.TWO_WEEKS.value),
                                    ('leg_1_dte', Period.SEVEN_WEEKS.value)])
-def test_eq(one_day_data, value):
-    values = (
-        one_day_data
-        .pipe(long_call)[1][0]
-        .pipe(eq, column=value[0], val=value[1])
-    )[value[0]].unique()
-
+def test_eq(sample_chain, value):
+    values = (sample_chain.pipe(eq, column=value[0], val=value[1]))[value[0]].unique()
     assert all(v == value[1] for v in values)
 
 
@@ -128,13 +132,8 @@ def test_eq(one_day_data, value):
                                    ('leg_1_dte', Period.DAY.value),
                                    ('leg_1_dte', Period.TWO_WEEKS.value),
                                    ('leg_1_dte', Period.SEVEN_WEEKS.value)])
-def test_lt(one_day_data, value):
-    values = (
-        one_day_data
-        .pipe(long_call)[1][0]
-        .pipe(lt, column=value[0], val=value[1])
-    )[value[0]].unique()
-
+def test_lt(sample_chain, value):
+    values = (sample_chain.pipe(eq, column=value[0], val=value[1]))[value[0]].unique()
     assert all(v < value[1] for v in values)
 
 
@@ -147,12 +146,8 @@ def test_lt(one_day_data, value):
                                    ('leg_1_dte', Period.DAY.value),
                                    ('leg_1_dte', Period.TWO_WEEKS.value),
                                    ('leg_1_dte', Period.SEVEN_WEEKS.value)])
-def test_ne(one_day_data, value):
-    values = (
-        one_day_data
-        .pipe(long_call)[1][0]
-        .pipe(ne, column=value[0], val=value[1])
-    )[value[0]].unique()
+def test_ne(sample_chain, value):
+    values = (sample_chain.pipe(eq, column=value[0], val=value[1]))[value[0]].unique()
     assert all(v != value[1] for v in values)
 
 
@@ -165,10 +160,6 @@ def test_ne(one_day_data, value):
                                    ('leg_1_dte', Period.DAY.value, Period.ONE_WEEK.value),
                                    ('leg_1_dte', Period.TWO_WEEKS.value, Period.THREE_WEEKS.value)
                                    ])
-def test_between(one_day_data, value):
-    values = (
-        one_day_data
-        .pipe(long_call)[1][0]
-        .pipe(between, column=value[0], start=value[1], end=value[2]))[value[0]].unique()
-
+def test_between(sample_chain, value):
+    values = (sample_chain.pipe(eq, column=value[0], val=value[1]))[value[0]].unique()
     assert all(value[1] <= v <= value[2] for v in values)
