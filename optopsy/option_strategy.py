@@ -1,5 +1,6 @@
 from optopsy.option_legs import *
 from .enums import OptionType, OrderAction
+from functools import reduce
 import filter as f
 
 
@@ -45,16 +46,20 @@ default_filters = {
 
 def _create_spread(legs, valid_filters, **kwargs):
 	u_filters = {k: v for k, v in kwargs if k in valid_filters}
+	
+	# make sure this merges properly
     merged_filters = {k: default_filters[k] for k, v in u_filters if k[v] is None}
     return list(map(lambda l: _apply_entry_filters(l, merged_filters), legs))
 
 
 def _apply_entry_filters(leg, u_filter):
-	for f in u_filter
+	return reduce(lambda k: leg.pipe(_do_apply_filter, k=k, v=u_filter[k]), u_filter.keys())
+
 
 # this returns a dataframe
-def _do_apply_entry_filter(l, k, v):
+def _do_apply_filter(l, k, v):
 	return getattr(f, k)(l, v)
+
 
 def long_call(data, **kwargs):
 	valid_filters = ['abs_delta', 'dte', 'price']
