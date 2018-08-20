@@ -5,11 +5,11 @@ def run_strategy():
     # fetch the option chains from our data source
     data = op.get(
         'data/SPX.csv',
-        struct=op.structs.cboe_struct,
+        struct=op.Struct.CBOE,
         prompt=False
     )
     
-    entry_filters = {dte: op.Period.SEVEN_WEEKS, price: 1.0}
+    entry_filters = {'dte': op.Period.SEVEN_WEEKS, 'price': 1.0}
     exit_filters = {}
 
     # test our strategy with our defined filter rules,
