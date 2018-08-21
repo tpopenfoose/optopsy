@@ -4,39 +4,41 @@ from functools import reduce
 import filter as f
 
 
-default_filters = {
+leg_filters = {
     'abs_delta': (0.4, 0.5, 0.6),
     'leg_1_abs_delta': (0.1, 0.2, 0.3),
     'leg_2_abs_delta': (0.3, 0.4, 0.5),
     'leg_3_abs_delta': (0.5, 0.6, 0.7),
     'leg_4_abs_delta': (0.7, 0.8, 0.9),
 
-    'dte': [
+    'dte': (
         Period.FOUR_WEEKS.value - 3,
         Period.FOUR_WEEKS.value,
         Period.FOUR_WEEKS.value + 3
-    ],
-    'leg_1_dte': [
+    ),
+    'leg_1_dte': (
         Period.FOUR_WEEKS.value - 3,
         Period.FOUR_WEEKS.value,
         Period.FOUR_WEEKS.value + 3
-    ],
-    'leg_2_dte': [
+    ),
+    'leg_2_dte': (
         Period.FOUR_WEEKS.value - 3,
         Period.FOUR_WEEKS.value,
         Period.FOUR_WEEKS.value + 3
-    ],
-    'leg_3_dte': [
+    ),
+    'leg_3_dte': (
         Period.FOUR_WEEKS.value - 3,
         Period.FOUR_WEEKS.value,
         Period.FOUR_WEEKS.value + 3
-    ],
-    'leg_4_dte': [
+    ),
+    'leg_4_dte': (
         Period.FOUR_WEEKS.value - 3,
         Period.FOUR_WEEKS.value,
         Period.FOUR_WEEKS.value + 3
-    ],
+    ),
+}
 
+spread_filters = {
     'price': None,
     'leg_1_leg_2_dist': None,
     'leg_2_leg_3_dist': None,
@@ -45,18 +47,33 @@ default_filters = {
 
 
 def _create_spread(legs, valid_filters, **kwargs):
-	u_filters = {k: v for k, v in kwargs if k in valid_filters}
 	
-	# make sure this merges properly
-    merged_filters = {k: default_filters[k] for k, v in u_filters if k[v] is None}
-    filtered_legs = list(map(lambda l: _apply_entry_filters(l, merged_filters), legs))
-    return _build_spread(filtered_legs)
+	l_filters = _process_filters(leg_filters, valid_filters, kwargs)
+    filtered_legs = list(map(lambda l: _apply_entry_filters(l, l_filters), legs))
+    
+    spread = _build_spread(filtered_legs)
+    
+    s_filters = _process_filters(spread_filters, valid_filters, kwargs)
+    return _apply_entry_filters(spread, s_filters)
+
+
+def _process_filters(base, filters, **kwargs):
+	f = {k: v for k, v in kwargs if k in filters}
+	return _merged_filters(base, f)
+	
+# make sure this merges properly
+def _merge_filters(base, filters):
+	return {k: base[k] for k, v in filters if k[v] is None}
 
 
 def _apply_entry_filters(leg, m_filters):
 	return reduce(lambda k: leg.pipe(_do_apply_entry_filter, k=k, v=m_filters[k]), m_filters.keys())
 
 
+def _build_spread(legs):
+	pass
+	
+	
 # this returns a dataframe
 def _do_apply_entry_filters(l, k, v):
 	return getattr(f, k)(l, v)

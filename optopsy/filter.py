@@ -13,7 +13,7 @@ def _process_tuple_val(leg, val, col):
 def _process_multi_tuple_val():
 	pass
 
-def abs_delta(leg, val, num=1):
+def abs_delta(leg, val, num=None):
     return _process_tuple_val(leg, val, f"leg_{num}_delta")
 
 
@@ -40,6 +40,19 @@ def dte(leg, val, num=None):
 
 def leg_1_dte(leg, val):
 	return dte(leg, val, num=1)
+	
+
+def leg_2_dte(leg, val):
+	return dte(leg, val, num=2)
+
+
+def leg_3_dte(leg, val):
+	return dte(leg, val, num=3)
+	
+	
+def leg_4_dte(leg, val):
+	return dte(leg, val, num=4)
+	
 	
 
 
