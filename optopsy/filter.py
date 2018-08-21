@@ -1,13 +1,45 @@
 from .option_query import *
 
 
-def abs_delta():
-    pass
+def _process_tuple_val(leg, val, col):
+	if not isinstance(val, tuple):
+        return leg
+    
+	return (leg
+			.pipe(nearest, column=col, val=val[1])
+			.pipe(between, column=col, val=val[0], val=val[2])
+		    )
+
+def _process_multi_tuple_val():
+	pass
+
+def abs_delta(leg, val, num=1):
+    return _process_tuple_val(leg, val, f"leg_{num}_delta")
 
 
-def abs_delta_max():
-    pass
+def leg_1_abs_delta(leg, val):
+    return abs_delta(leg, val, num=1)
 
 
-def abs_delta_min():
-    pass
+def leg_2_abs_delta(leg, val):
+    return abs_delta(leg, val, num=2)
+
+
+def leg_3_abs_delta(leg, val):
+    return abs_delta(leg, val, num=3)
+
+
+def leg_4_abs_delta(leg, val):
+	return abs_delta(leg, val, num=4)
+	
+
+def dte(leg, val, num=None):
+	header = "dte" if num is None else f"leg_{num}_dte"
+	return _process_tuple_val(leg, val, header)
+	
+
+def leg_1_dte(leg, val):
+	return dte(leg, val, num=1)
+	
+
+

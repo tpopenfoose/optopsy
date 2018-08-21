@@ -5,11 +5,11 @@ import filter as f
 
 
 default_filters = {
-    'abs_delta': [0.4, 0.5, 0.6],
-    'leg_1_abs_delta': [0.1, 0.2, 0.3],
-    'leg_2_abs_delta': [0.3, 0.4, 0.5],
-    'leg_3_abs_delta': [0.5, 0.6, 0.7],
-    'leg_4_abs_delta': [0.7, 0.8, 0.9],
+    'abs_delta': (0.4, 0.5, 0.6),
+    'leg_1_abs_delta': (0.1, 0.2, 0.3),
+    'leg_2_abs_delta': (0.3, 0.4, 0.5),
+    'leg_3_abs_delta': (0.5, 0.6, 0.7),
+    'leg_4_abs_delta': (0.7, 0.8, 0.9),
 
     'dte': [
         Period.FOUR_WEEKS.value - 3,
@@ -49,15 +49,16 @@ def _create_spread(legs, valid_filters, **kwargs):
 	
 	# make sure this merges properly
     merged_filters = {k: default_filters[k] for k, v in u_filters if k[v] is None}
-    return list(map(lambda l: _apply_entry_filters(l, merged_filters), legs))
+    filtered_legs = list(map(lambda l: _apply_entry_filters(l, merged_filters), legs))
+    return _build_spread(filtered_legs)
 
 
-def _apply_entry_filters(leg, u_filter):
-	return reduce(lambda k: leg.pipe(_do_apply_filter, k=k, v=u_filter[k]), u_filter.keys())
+def _apply_entry_filters(leg, m_filters):
+	return reduce(lambda k: leg.pipe(_do_apply_entry_filter, k=k, v=m_filters[k]), m_filters.keys())
 
 
 # this returns a dataframe
-def _do_apply_filter(l, k, v):
+def _do_apply_entry_filters(l, k, v):
 	return getattr(f, k)(l, v)
 
 
