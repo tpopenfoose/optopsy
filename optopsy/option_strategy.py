@@ -47,40 +47,42 @@ spread_filters = {
 
 
 def _create_spread(legs, valid_filters, **kwargs):
-	
-	l_filters = _process_filters(leg_filters, valid_filters, kwargs)
+    # apply filters to each leg
+    l_filters = _process_filters(leg_filters, valid_filters, kwargs)
     filtered_legs = list(map(lambda l: _apply_entry_filters(l, l_filters), legs))
     
+	  # join the legs together to form a spread, if possible
     spread = _build_spread(filtered_legs)
     
+    # apply spread level filters and return thr result
     s_filters = _process_filters(spread_filters, valid_filters, kwargs)
     return _apply_entry_filters(spread, s_filters)
 
 
 def _process_filters(base, filters, **kwargs):
-	f = {k: v for k, v in kwargs if k in filters}
-	return _merged_filters(base, f)
+    f = {k: v for k, v in kwargs if k in filters}
+    return _merged_filters(base, f)
 	
 # make sure this merges properly
 def _merge_filters(base, filters):
-	return {k: base[k] for k, v in filters if k[v] is None}
+    return {k: base[k] for k, v in filters if k[v] is None}
 
 
 def _apply_entry_filters(leg, m_filters):
-	return reduce(lambda k: leg.pipe(_do_apply_entry_filter, k=k, v=m_filters[k]), m_filters.keys())
+    return reduce(lambda k: leg.pipe(_do_apply_entry_filter, k=k, v=m_filters[k]), m_filters.keys())
 
 
 def _build_spread(legs):
-	pass
+    pass
 	
 	
 # this returns a dataframe
 def _do_apply_entry_filters(l, k, v):
-	return getattr(f, k)(l, v)
+    return getattr(f, k)(l, v)
 
 
 def long_call(data, **kwargs):
-	valid_filters = ['abs_delta', 'dte', 'price']
+    valid_filters = ['abs_delta', 'dte', 'price']
     legs = create_legs(data, legs=[(OptionType.CALL, 1)])
     return OrderAction.BTO, _create_spread(legs, valid_filters, kwargs)
 
@@ -112,56 +114,56 @@ def long_call_spread(data, **kwargs):
 
 # credit
 def short_call_spread(data, **kwargs):
-	valid_filters = ['leg_1_abs_delta', 'leg_2_abs_delta', 'dte', 'price']
+    valid_filters = ['leg_1_abs_delta', 'leg_2_abs_delta', 'dte', 'price']
     legs = create_legs(data, legs=[(OptionType.CALL, -1), (OptionType.CALL, 1)])
     return OrderAction.STO, _create_spread(legs, valid_filters, kwargs)
 
 
 # credit
 def long_put_spread(data, **kwargs):
-	valid_filters = ['leg_1_abs_delta', 'leg_2_abs_delta', 'dte', 'price']
+    valid_filters = ['leg_1_abs_delta', 'leg_2_abs_delta', 'dte', 'price']
     legs = create_legs(data, legs=[(OptionType.PUT, 1), (OptionType.PUT, -1)])
     return OrderAction.BTO, _create_spread(legs, valid_filters, kwargs)
 
 
 # debit
 def short_put_spread(data, **kwargs):
-	valid_filters = ['leg_1_abs_delta', 'leg_2_abs_delta', 'dte', 'price']
+    valid_filters = ['leg_1_abs_delta', 'leg_2_abs_delta', 'dte', 'price']
     legs = create_legs(data, legs=[(OptionType.PUT, -1), (OptionType.PUT, 1)])
     return OrderAction.STO, _create_spread(legs, valid_filters, kwargs)
 
 
 def long_iron_condor(data, **kwargs):
-	valid_filters = ['leg_1_abs_delta', 'leg_2_abs_delta', 'leg_3_abs_delta',
- 					'leg_4_abs_delta', 'dte', 'price', 'leg_1_leg_2_dist',
-					 'leg_2_leg_3_dist', 'leg_3_leg_4_dist']
+    valid_filters = ['leg_1_abs_delta', 'leg_2_abs_delta', 'leg_3_abs_delta',
+ 		    'leg_4_abs_delta', 'dte', 'price', 'leg_1_leg_2_dist',
+				'leg_2_leg_3_dist', 'leg_3_leg_4_dist']
     legs = create_legs(data, legs=[(OptionType.PUT, 1), (OptionType.PUT, -1),
         (OptionType.CALL, -1), (OptionType.CALL, 1)])
     return OrderAction.BTO, _create_spread(legs, valid_filters, kwargs)
 
 
 def short_iron_condor(data, **kwargs):
-	valid_filters = ['leg_1_abs_delta', 'leg_2_abs_delta', 'leg_3_abs_delta',
- 					'leg_4_abs_delta', 'dte', 'price', 'leg_1_leg_2_dist',
-					 'leg_2_leg_3_dist', 'leg_3_leg_4_dist']
+    valid_filters = ['leg_1_abs_delta', 'leg_2_abs_delta', 'leg_3_abs_delta',
+ 		    'leg_4_abs_delta', 'dte', 'price', 'leg_1_leg_2_dist',
+		    'leg_2_leg_3_dist', 'leg_3_leg_4_dist']
     legs = create_legs(data, legs=[(OptionType.PUT, 1), (OptionType.PUT, -1),
         (OptionType.CALL, -1), (OptionType.CALL, 1)])
     return OrderAction.STO, _create_spread(legs, valid_filters, kwargs)
 
 
 def long_iron_butterfly(data, **kwargs):
-	valid_filters = ['leg_1_abs_delta', 'leg_2_abs_delta', 'leg_3_abs_delta',
- 					'leg_4_abs_delta', 'dte', 'price', 'leg_1_leg_2_dist',
-					 'leg_3_leg_4_dist']
+    valid_filters = ['leg_1_abs_delta', 'leg_2_abs_delta', 'leg_3_abs_delta',
+ 		    'leg_4_abs_delta', 'dte', 'price', 'leg_1_leg_2_dist',
+		    'leg_3_leg_4_dist']
     legs = create_legs(data, legs=[(OptionType.PUT, 1), (OptionType.PUT, -1),
         (OptionType.CALL, -1), (OptionType.CALL, 1)])
     return OrderAction.BTO, _create_spread(legs, valid_filters, kwargs)
 
 
 def short_iron_butterfly(data, **kwargs):
-	valid_filters = ['leg_1_abs_delta', 'leg_2_abs_delta', 'leg_3_abs_delta',
- 					'leg_4_abs_delta', 'dte', 'price', 'leg_1_leg_2_dist',
-					 'leg_3_leg_4_dist']
+    valid_filters = ['leg_1_abs_delta', 'leg_2_abs_delta', 'leg_3_abs_delta',
+        'leg_4_abs_delta', 'dte', 'price', 'leg_1_leg_2_dist',
+        'leg_3_leg_4_dist']
     legs = create_legs(data, legs=[(OptionType.PUT, 1), (OptionType.PUT, -1),
         (OptionType.CALL, -1), (OptionType.CALL, 1)])
     return OrderAction.STO, _create_spread(legs, valid_filters, kwargs)
