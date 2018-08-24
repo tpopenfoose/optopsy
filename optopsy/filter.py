@@ -52,7 +52,15 @@ def leg_3_dte(leg, val):
 	
 def leg_4_dte(leg, val):
     return dte(leg, val, num=4)
-	
+
+
+def price(legs, val):
+    pass
+    
+    
+def quantity(legs, val):
+    pass
+
 	
 
 

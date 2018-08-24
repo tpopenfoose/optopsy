@@ -35,50 +35,49 @@ leg_filters = {
         Period.FOUR_WEEKS.value - 3,
         Period.FOUR_WEEKS.value,
         Period.FOUR_WEEKS.value + 3
-    ),
+    )
 }
+
 
 spread_filters = {
     'price': None,
     'leg_1_leg_2_dist': None,
     'leg_2_leg_3_dist': None,
-    'leg_3_leg_4_dist': None
+    'leg_3_leg_4_dist': None,
+    'quantity': 1
 }
 
 
 def _create_spread(legs, valid_filters, **kwargs):
     # apply filters to each leg
     l_filters = _process_filters(leg_filters, valid_filters, kwargs)
-    filtered_legs = list(map(lambda l: _apply_entry_filters(l, l_filters), legs))
+    filtered_legs = [_apply_filters(l, l_filters) for l in legs)]
     
 	  # join the legs together to form a spread, if possible
     spread = _build_spread(filtered_legs)
     
     # apply spread level filters and return thr result
     s_filters = _process_filters(spread_filters, valid_filters, kwargs)
-    return _apply_entry_filters(spread, s_filters)
+    return _apply_filters(spread, s_filters)
 
 
 def _process_filters(base, filters, **kwargs):
     f = {k: v for k, v in kwargs if k in filters}
-    return _merged_filters(base, f)
-	
-# make sure this merges properly
-def _merge_filters(base, filters):
-    return {k: base[k] for k, v in filters if k[v] is None}
+    return {**base, **f}
 
 
-def _apply_entry_filters(leg, m_filters):
-    return reduce(lambda k: leg.pipe(_do_apply_entry_filter, k=k, v=m_filters[k]), m_filters.keys())
+def _apply_filters(leg, filters):
+    return reduce(lambda k: leg.pipe(_do_apply_filters, k=k, v=m_filters[k]), m_filters.keys())
 
 
 def _build_spread(legs):
-    pass
+    # join legs based on quote date
+    return reduce(lambda l, r: pd.merge(l, r, on=['quote_date'], how='inner'), legs)
 	
 	
 # this returns a dataframe
-def _do_apply_entry_filters(l, k, v):
-    return getattr(f, k)(l, v)
+def _do_apply_filters(l, k, v):
+    return l if v is None else getattr(f, k)(l, v)
 
 
 def long_call(data, **kwargs):
